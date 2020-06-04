@@ -88,42 +88,58 @@ void ofApp::draw(){
       break;
     }
     case 0: {
-      int ct = 36;
-      float r = 100;
+      // Setup masks
       ofFbo mask;
       ofFbo content;
+      mask.allocate(w, w, GL_RGBA);
+      content.allocate(w, w, GL_RGBA);
+      
+      
       
       // Draw mask
       mask.begin();
+      ofClear(0,0,0,0);
+      ofSetColor(255);
       ofPushMatrix();
-      ofTranslate(w/2,w/4);
-      ofDrawRectangle(0, 0, w/4, w/4);
+      ofTranslate(w/4,w/8);
+      ofDrawRectangle(0, 0, w/2, w/4);
       ofPopMatrix();
       mask.end();
       
       // Draw contents
       content.begin();
+      ofClear(0,0,0,0);
+      ofSetColor(255);
       ofPushMatrix();
       ofTranslate(w/2, w/2);
       ofTranslate(0,-w/4);
-      for (int i = 0; i < ct; i++) {
-        float prg = (float)i/((float)ct-1.f); // double up on first point
-        float angle = TWO_PI*prg + PI/2.;
-        float slide = fmod(ofGetElapsedTimef(), 2.f) * r*2;
-        float x = r * -cos(angle) + prg*slide;
-        float y = r * sin(angle);
-        l.lineTo(x,y);
-        ofDrawCircle(x, y, 5);
-      }
-      l.draw();
+      slideCirc();
+      ofTranslate(-w/2,0);
+      slideCirc();
+
       ofPopMatrix();
       content.end();
-      
-      // Apply mask?
       content.getTexture().setAlphaMask(mask.getTexture());
+      content.draw(0, 0);
+      content.draw(100, 100);
       break;
     }
   }
+}
+
+void ofApp::slideCirc() {
+  int ct = 36;
+  float r = w/8;
+  for (int i = 0; i < ct; i++) {
+    float prg = (float)i/((float)ct-1.f); // double up on first point
+    float angle = TWO_PI*prg + PI/2.;
+    float slide = ofMap(sin(ofGetElapsedTimef()), -1, 1, 0, r*4);
+    float x = r * -cos(angle) + prg*slide;
+    float y = r * sin(angle);
+    l.lineTo(x,y);
+//    ofDrawCircle(x, y, 5);
+  }
+  l.draw();
 }
 
 //--------------------------------------------------------------
