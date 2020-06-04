@@ -138,6 +138,7 @@ void ofApp::draw(){
 }
 
 void ofApp::slideCirc() {
+  l.newSubPath();
   int ct = 36;
   float r = w/8;
   for (int i = 0; i < ct; i++) {
@@ -149,6 +150,7 @@ void ofApp::slideCirc() {
     l.lineTo(x,y);
 //    ofDrawCircle(x, y, 5);
   }
+  
   l.draw();
 }
 
