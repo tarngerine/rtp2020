@@ -26,7 +26,15 @@ class ofApp : public ofBaseApp{
   ofxPanel gui;
   ofxFloatSlider param1;
   ofxFloatSlider param2;
+  ofxFloatSlider param3;
+  ofxFloatSlider param4;
+//  ofxFloatSlider param5;
+//  ofxFloatSlider param6;
+//  ofxFloatSlider param7;
+//  ofxFloatSlider param8;
   bool hideGui;
+  ofFbo mask;
+  ofFbo content;
   
   int v;
   int w;
