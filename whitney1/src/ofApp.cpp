@@ -35,6 +35,8 @@ void ofApp::draw(){
   ofSetColor(255, 255, 255);
   float t = ofGetElapsedTimef();
   l.clear();
+  
+  // Use arrow keys to navigate across versions, first version shown is case 0, scroll down to see it!
   switch(v) {
     case 4: {
       for (int i = 0; i < 80; i++) {
