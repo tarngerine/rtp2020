@@ -1,5 +1,10 @@
 #include "ofApp.h"
 
+// Recreating the Past, Summer 2020
+// Julius Tarng
+// Recreating a 5 second clip from Arabesque by John Whitney
+// Explainer video: https://www.loom.com/share/0d12fe71274d45de89718ddc328d892f
+
 //--------------------------------------------------------------
 void ofApp::setup(){
   gui.setup();
@@ -191,7 +196,7 @@ void ofApp::draw(){
 
 void ofApp::slideCirc() {
   l.newSubPath();
-  l.clear();
+  l.clear(); // Fix paths being connected
   int ct = 36;
   float r = w/8;
   for (int i = 0; i < ct; i++) {
@@ -207,11 +212,13 @@ void ofApp::slideCirc() {
       y += ofMap(param3,0,1,-50,50)*100*cos(angle*param4*TWO_PI)*cos(angle*param4*TWO_PI);
     }
     l.curveTo(x,y);
-//    ofDrawCircle(x, y, 3);
+    // ofDrawCircle(x, y, 3); // For debugging
   }
   
   l.draw();
-  //  grab the line, resample it and draw with circles:
+
+  // Hack from @zach to smooth out weird gaps
+  // Grab the line, resample it and draw with circles:
   ofPolyline line = l.getOutline()[0];
   line = line.getResampledBySpacing(2.5);
   for (int i = 0; i < line.size(); i++){
