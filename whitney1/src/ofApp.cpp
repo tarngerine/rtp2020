@@ -11,7 +11,9 @@ void ofApp::setup(){
   
   l.setFilled(false);
   l.setStrokeWidth(1);
-
+  ofEnableAntiAliasing();
+  ofEnableSmoothing();
+  
 }
 
 //--------------------------------------------------------------
@@ -120,8 +122,14 @@ void ofApp::draw(){
       ofPopMatrix();
       content.end();
       content.getTexture().setAlphaMask(mask.getTexture());
-      content.draw(0, 0);
-      content.draw(100, 100);
+      ofPushMatrix();
+      for (int i = 0; i < 5; i++) {
+        ofTranslate(-w/2,-w/2);
+        ofRotateDeg(30.*(float)i/5.);
+        ofTranslate(w/2,w/2);
+        content.draw(0, 0);
+      }
+      ofPopMatrix();
       break;
     }
   }
