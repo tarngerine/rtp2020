@@ -28,7 +28,7 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-  mesh.clearVertices();
+//  mesh.clearVertices();
   string s = "唐";
   ofBackground(0);
 //  font.drawString(s,20,100);
@@ -137,22 +137,26 @@ void ofApp::draw(){
         break;
       }
       case 2: {
+        // remove clearVertices() for the cool layered effect, but it will lagggg and the prg animation wont really work
+        
         for (int j = 0; j < polylines.size(); j++){
-          ofPolyline line = polylines[j].getResampledBySpacing(1);
+          ofPolyline line = polylines[j]; // .getResampledBySpacing(1);
           for (int k = 0; k < line.size(); k++){
             int offset = prg * (float)line.size();
             int k2 = (k + offset)%line.size();
+            // TODO: replace the first vertex with the progress animated point
+//            mesh.vertices[0] = line.getPointAtIndexInterpolated(k2);
             mesh.addVertex(line.getPointAtIndexInterpolated(k2));
           }
         }
-        mesh.draw();
+//        mesh.draw();
         break;
       }
     }
     
   }
-  if (v == 1) {
-//      mesh.draw();
+  if (v == 2) {
+      mesh.draw();
   }
   
   ofPopMatrix();
@@ -161,7 +165,7 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
   if(key == 'r') {
-    mesh.clearColors();
+    mesh.clear();
     for(int i=0; i<1000; i++) {
       mesh.addColor(ofColor(ofRandom(255), ofRandom(255), ofRandom(255)));
     }
