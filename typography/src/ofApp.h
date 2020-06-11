@@ -26,4 +26,8 @@ class ofApp : public ofBaseApp{
   
   vector < angleLengthLine > alines;
   ofMesh mesh;
+  
+  vector <ofColor> colors;
+  
+  int v;
 };
