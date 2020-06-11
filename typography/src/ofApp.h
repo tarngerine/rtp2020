@@ -28,6 +28,7 @@ class ofApp : public ofBaseApp{
   ofMesh mesh;
   
   vector <ofColor> colors;
+  ofColor clr;
   
   int v;
 };

@@ -20,6 +20,8 @@ public:
     vector < float > angles;
     vector < float > angleDiffs;
     vector < float > distances;
+    vector < ofPoint > points;
+  ofPolyline polyline;
     
     // startTime is an attribute (variable) of the class
     // startTime stores the moment in time when the line was created
@@ -41,6 +43,7 @@ public:
             angles.clear();
             angleDiffs.clear();
             distances.clear();
+            points.clear();
             
             // reset startPoint to be the 0th vertex of line
             startPoint = line.getVertices()[0];
@@ -88,10 +91,52 @@ public:
             }
         }
     }
+
+  // update all points based on angleDiffs
+  void update(){
+      // declare ofPoint pt and copy its value from startPoint
+      ofPoint pt = startPoint;
+    
+      points.clear();
+      
+      // add pt as the 0th vertex of the shaoe
+      points.push_back(ofPoint(pt.x, pt.y));
+      polyline.addVertex(ofPoint(pt.x, pt.y));
+      
+      // declare initial angle, default value is 0
+      float angle = 0;
+      
+      // iterate through all elements in the angles vector
+      for (int i = 0; i < angles.size(); i++){
+          
+          // for the 0th vertex, retrieve the 0th value in angles
+          if (i == 0){
+              angle = angles[0];
+          }
+          // for all other vertices after the 0th
+          else {
+              // update angle by adding to itself the value angleDiffs[i]  * cos(x)
+              // where x is 0.5 * the time elapsed since startTime
+              // we cos(x) because when the line begins to be drawn, x=0 => cos(x)=1
+              // so at the beginning of times, the line is drawn as is
+              // the line oscillates between original state and straight when cos(x)=0
+            angle += angleDiffs[i]; //* cos( 0.5* (ofGetElapsedTimef() - startTime));
+          }
+          
+          // update pt by adding distances[i] at the angle
+          pt.x += cos(angle) * distances[i];
+          pt.y += sin(angle) * distances[i];
+          
+          // add the vertex to the points
+          points.push_back(ofPoint(pt.x, pt.y));
+          polyline.addVertex(ofPoint(pt.x, pt.y));
+          
+      }
+  }
     
     // draw() is a method (function) of the class
     void draw(){
-        
+      update();
         // do not draw the fill of figures, only stroke
         ofNoFill();
         
@@ -101,35 +146,8 @@ public:
         // declare ofPoint pt and copy its value from startPoint
         ofPoint pt = startPoint;
         
-        // add pt as the 0th vertex of the shaoe
-        ofVertex(pt.x, pt.y);
-        
-        // declare initial angle, default value is 0
-        float angle = 0;
-        
-        // iterate through all elements in the angles vector
-        for (int i = 0; i < angles.size(); i++){
-            
-            // for the 0th vertex, retrieve the 0th value in angles
-            if (i == 0){
-                angle = angles[0];
-            }
-            // for all other vertices after the 0th
-            else {
-                // update angle by adding to itself the value angleDiffs[i]  * cos(x)
-                // where x is 0.5 * the time elapsed since startTime
-                // we cos(x) because when the line begins to be drawn, x=0 => cos(x)=1
-                // so at the beginning of times, the line is drawn as is
-                // the line oscillates between original state and straight when cos(x)=0
-                angle += angleDiffs[i] * cos( 0.5* (ofGetElapsedTimef() - startTime));
-            }
-            
-            // update pt by adding distances[i] at the angle
-            pt.x += cos(angle) * distances[i];
-            pt.y += sin(angle) * distances[i];
-            
-            // add the vertex to the shape
-            ofVertex(pt.x, pt.y);
+        for (int i = 0; i < points.size(); i++) {
+            ofVertex(points[i].x, points[i].y);
         }
         
         // after all vertices are added, end the shape
