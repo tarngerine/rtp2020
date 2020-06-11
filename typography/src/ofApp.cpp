@@ -6,12 +6,16 @@ void ofApp::setup(){
   settings.antialiased = true;
   settings.dpi = 72;
   settings.addRanges(ofAlphabet::Chinese);
-//  settings.addRanges(ofAlphabet::Latin);
   settings.contours = true;
   font.load(settings);
   
-//  mesh.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
   mesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
+  
+  ofSeedRandom(1);
+  
+  for(int i=0; i<1000; i++) {
+    mesh.addColor(ofColor(ofRandom(255), ofRandom(255), ofRandom(255)));
+  }
 }
 
 //--------------------------------------------------------------
@@ -38,31 +42,27 @@ void ofApp::draw(){
   for (int i = 0; i < paths.size(); i++){
     paths[i].setPolyWindingMode(OF_POLY_WINDING_ODD);
     vector <ofPolyline> polylines = paths[i].getOutline();
-    
-    
 
     for (int j = 0; j < polylines.size(); j++){
-      polylines[j].draw();
-//      ofTessellator tes;
-//      tes.tessellateToMesh(polylines[j], OF_POLY_WINDING_NONZERO, mesh);
       for (int k = 0; k < polylines[j].size(); k++){
-//        ofDrawCircle(polylines[j][k], .3);
         mesh.addVertex(polylines[j][k]);
-//        float pct1 = ofMap((j+1)*(k+1), 0, (polylines.size()+1)*(polylines[j].size()+1), 0, 1);
-//        float pct2 = ofMap((j+1)*(k+1), 0, (polylines.size()+1)*(polylines[j].size()+1), 1, 0);
-//        mesh.addColor(ofColor(255 * pct1, 255 * pct2, 255 * pct1*pct2));
-        mesh.addColor(ofColor(ofRandom(255), ofRandom(255), ofRandom(255)));
       }
-      mesh.draw();
     }
   }
-
+  mesh.draw();
+  
   ofPopMatrix();
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-
+  if(key == 'r') {
+    mesh.clear();
+    mesh.clearColors();
+    for(int i=0; i<1000; i++) {
+      mesh.addColor(ofColor(ofRandom(255), ofRandom(255), ofRandom(255)));
+    }
+  }
 }
 
 //--------------------------------------------------------------

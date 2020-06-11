@@ -25,6 +25,5 @@ class ofApp : public ofBaseApp{
   ofTrueTypeFont font;
   
   vector < angleLengthLine > alines;
-  
   ofMesh mesh;
 };
