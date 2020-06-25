@@ -20,7 +20,7 @@
 
 
 ## Week 4: Patterns ([Notes](https://github.com/tarngerine/rtp2020/issues/4))
-N/A, busy this week
+N/A, busy this week, wanted to recreate [these pieces](https://paper.dropbox.com/doc/Julius-Tarng-Recreating-Anni-Albers--A2j5nMTdGXoXlifqWO3uo97GAQ-LygCnWNcMRoIPMl53dXXS)
 
 ## Week 5: Images and Mosaics (Lillian Schwartz, Ken Knowlton) ([Notes](https://github.com/tarngerine/rtp2020/issues/5))
 - [Before Before](https://github.com/tarngerine/rtp2020/tree/master/lillian1/src)
