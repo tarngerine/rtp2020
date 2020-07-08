@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include <string>
 
 class ofApp : public ofBaseApp{
 
@@ -29,4 +30,9 @@ class ofApp : public ofBaseApp{
   vector <ofPoint> steps;
   
   vector <ofPoint> stepOut(ofPoint pt);
+  vector <vector<int>> matrixbool;
+  vector <vector<int>> matrixcomponents;
+  
+  void stepOut(int x,int y, vector<vector<int>> & matrix);
+  int leastAround(int x,int y, vector<vector<int>> & matrix);
 };
