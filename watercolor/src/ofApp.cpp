@@ -49,10 +49,10 @@ void ofApp::update(){
 
   for(int i=0;i<=8;i++) {
     float prg = ofMap(i,0,8,0,M_PI*2);
-    brush.addVertex(100*cos(prg), 100*sin(prg));
+    brush.addVertex(50*cos(prg), 50*sin(prg));
   }
   
-  float offset = 80;
+  float offset = 40;
   float t = ofGetElapsedTimef();
   float noiseX = mouse.x + t;
   float noiseY = mouse.y + t;
@@ -85,18 +85,6 @@ void ofApp::update(){
     stamp.close();
   }
   
-  // reduce wetness
-  
-//  wetness.readToPixels(wetnessp);
-//  for(int y=0;y<wetnessp.getHeight();y++) {
-//    for(int x=0;x<wetnessp.getWidth();x++) {
-//      wetnessp.setColor(x, y, ofColor(MAX((wetnessp.getColor(x,y).getBrightness() - 1), 0)));
-//    }
-//  }
-}
-
-//--------------------------------------------------------------
-void ofApp::draw(){
   // dry wetness
   wetness.begin();
     dry.begin();
@@ -105,6 +93,10 @@ void ofApp::draw(){
       ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
     dry.end();
   wetness.end();
+}
+
+//--------------------------------------------------------------
+void ofApp::draw(){
   
   ofBackground(0);
   // Brush preview
@@ -124,7 +116,21 @@ void ofApp::draw(){
       ofPushMatrix();
       ofTranslate(mouse);
       ofScale(stampSize);
-    stamp.setFillColor(ofColor(0,0,0,40));
+    // play with having a small version of the stamp inside the big one to simulate the brush lift effect of leaving a spot in the middle
+    
+    // play with gradiating outwards from center (dark-> light) instead of a flat color
+    
+    // play with having more than 1 stamp at once with lower opacity to have a more natural appearance
+    
+    // play with squash/stretch with velocity to help avoid "broken shapes" effect
+    // and/or interpolate stamps (add additional ones in between current and prev to account for fps) if velocity > some amount
+    
+    // play with squash/stretch depending on the direction you move your pen to allow for diff parts of a character
+    
+    // play with trailing like polyline add trail of stamps, and generate stamp per vertex
+    
+    // allow gou/hooks with a flick, map velocity to size where faster = smaller past a certain threshold
+    stamp.setFillColor(ofColor(0,0,0,ofMap(abs((velocity.x+velocity.y)/2.),0,100,80,10)));
       stamp.draw();
       ofPopMatrix();
     fbo2.end();
@@ -159,37 +165,37 @@ void ofApp::draw(){
   
   ofSetColor(255);
 
-  fbo2.begin();
-    ofClear(0,0,0,0);
+  canvas.begin();
+    
     shader.begin();
     shader.setUniformTexture("canvas", canvas, 1);
     shader.setUniformTexture("wetness", wetness, 2);
     ofDrawRectangle(0,0,ofGetWidth(),ofGetHeight());
     shader.end();
-  fbo2.end();
+  canvas.end();
 
-  fbo2.draw(0,0);
+  canvas.draw(0,0);
   fbo1.draw(0,0);
   
   // debug preview wetness
-  
-  fbo2.begin();
-    ofClear(0,0,0,0);
-    shader2.begin();
-    shader2.setUniformTexture("wetness", wetness, 1);
-    ofDrawRectangle(0,0,ofGetWidth(),ofGetHeight());
-    shader2.end();
-  fbo2.end();
-  fbo2.readToPixels(wetnessp);
-  fbo2.draw(400,400);
-  ofSetColor(0,0,255);
-  for(int y=0;y<20;y++) {
-    for(int x=0;x<20;x++) {
-      string str = ofToString((float)wetnessp.getColor(x, y).r);
-      ofDrawBitmapString(str, x*15., y*15.);
-    }
-  }
-  ofSetColor(255);
+//
+//  fbo2.begin();
+//    ofClear(0,0,0,0);
+//    shader2.begin();
+//    shader2.setUniformTexture("wetness", wetness, 1);
+//    ofDrawRectangle(0,0,ofGetWidth(),ofGetHeight());
+//    shader2.end();
+//  fbo2.end();
+//  fbo2.readToPixels(wetnessp);
+//  fbo2.draw(400,400);
+//  ofSetColor(0,0,255);
+//  for(int y=0;y<20;y++) {
+//    for(int x=0;x<20;x++) {
+//      string str = ofToString((float)wetnessp.getColor(x, y).r);
+//      ofDrawBitmapString(str, x*15., y*15.);
+//    }
+//  }
+//  ofSetColor(255);
 }
 
 //--------------------------------------------------------------

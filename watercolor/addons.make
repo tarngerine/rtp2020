@@ -1,2 +1,2 @@
 ofxCppSketch
-ofxGaussian
+ofxTablet

@@ -4,8 +4,29 @@ uniform sampler2DRect wetness;
 void main()
 {
   vec2 pos = gl_FragCoord.xy;
-//  pos.y = 800. - pos.y;
-  vec3 color = texture2DRect(canvas, pos).rgb;
+  vec3 colorcanvas = texture2DRect(canvas, pos).rgb;
+  vec3 colorwetness = texture2DRect(wetness, pos).rgb;
   
-  gl_FragColor = vec4(color, 1.);
+  if (colorwetness.r > 0.) {
+  
+    // look at neighbors
+    float px = 1.;
+    vec2 n = vec2(pos.x, pos.y + px);
+    vec3 c_n = texture2DRect(canvas, n).rgb;
+
+    vec2 e = vec2(pos.x + px, pos.y);
+    vec3 c_e = texture2DRect(canvas, e).rgb;
+
+    vec2 s = vec2(pos.x, pos.y - px);
+    vec3 c_s = texture2DRect(canvas, s).rgb;
+
+    vec2 w = vec2(pos.x - px, pos.y);
+    vec3 c_w = texture2DRect(canvas, w).rgb;
+    
+    float c_max = min(colorcanvas.r, min(c_n.r, min(c_w.r, min(c_e.r, c_s.r))));
+    
+    gl_FragColor = vec4(c_max, c_max, c_max, 1.);
+  } else {
+    gl_FragColor = vec4(colorcanvas, 1.);
+  }
 }

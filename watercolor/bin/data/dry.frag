@@ -7,7 +7,7 @@ void main()
 //  pos.y = w - pos.y;
   vec3 rgb = texture2DRect(wetness, pos).rgb;
   
-  rgb.r = rgb.r - .005;
+  rgb.r = rgb.r - .0075 ;
 
   gl_FragColor = vec4(rgb, 1.);
 }
