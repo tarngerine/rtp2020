@@ -28,10 +28,11 @@ void ofApp::setup(){
   // 0 0 0
   // 0 0 0
   // 0 0 0
-  wetness.allocate(ofGetWidth(),ofGetHeight(), GL_RED);
+  wetness.allocate(ofGetWidth(),ofGetHeight(), GL_RGBA);
   wetness.begin();
-    ofClear(255,255,255,255);
+    ofClear(0,0,0,255);
   wetness.end();
+   wetnessp.allocate(ofGetWidth(),ofGetHeight(), OF_IMAGE_COLOR_ALPHA);
 }
 
 //--------------------------------------------------------------
@@ -90,18 +91,19 @@ void ofApp::update(){
 //      wetnessp.setColor(x, y, ofColor(MAX((wetnessp.getColor(x,y).getBrightness() - 1), 0)));
 //    }
 //  }
-  wetness.begin();
-    ofClear(0,0,0,0);
-    dry.begin();
-      dry.setUniformTexture("wetness", wetness, 2);
-      dry.setUniform1f("w", ofGetWidth());
-      ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
-    dry.end();
-  wetness.end();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+  // dry wetness
+  wetness.begin();
+    dry.begin();
+      dry.setUniformTexture("wetness", wetness, 1);
+      dry.setUniform1f("w", ofGetWidth());
+      ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+    dry.end();
+  wetness.end();
+  
   ofBackground(0);
   // Brush preview
   fbo1.begin();
@@ -126,6 +128,13 @@ void ofApp::draw(){
       ofPopMatrix();
     fbo2.end();
     
+
+    // composite to canvas
+    canvas.begin();
+      ofSetColor(255);
+      fbo2.draw(0,0);
+    canvas.end();
+    
 //    // add to wetness matrix
 //    ofPixels pxl;
 //    fbo2.readToPixels(pxl, 0);
@@ -142,7 +151,6 @@ void ofApp::draw(){
 //    }
 
     wetness.begin();
-      ofClear(0,0,0,0);
       wet.begin();
         wet.setUniformTexture("stamp", fbo2, 1);
         wet.setUniformTexture("wetness", wetness, 2);
@@ -150,12 +158,6 @@ void ofApp::draw(){
         ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
       wet.end();
     wetness.end();
-    
-    // composite to canvas
-    canvas.begin();
-//      ofSetColor(0);
-      fbo2.draw(0,0);
-    canvas.end();
   }
   
   ofSetColor(255);
@@ -164,9 +166,6 @@ void ofApp::draw(){
     ofClear(0,0,0,0);
     shader.begin();
     shader.setUniformTexture("canvas", canvas, 1);
-    
-    // convert ofPixels to ofImage bc shader doesnt accept ofPixels
-//    wetnessImg.setFromPixels(wetnessp);
     shader.setUniformTexture("wetness", wetness, 2);
     ofDrawRectangle(0,0,ofGetWidth(),ofGetHeight());
     shader.end();
@@ -176,14 +175,22 @@ void ofApp::draw(){
   fbo1.draw(0,0);
   
   // debug preview wetness
-
-//  for(int y=0;y<20;y++) {
-//    for(int x=0;x<20;x++) {
-////      string str = ofToString(wetness[x][y]);
-//      string str = ofToString(wetnessp.getColor(x, y).getBrightness());
-//      ofDrawBitmapString(str, x*15., y*15.);
-//    }
-//  }
+  
+  fbo2.begin();
+    ofClear(0,0,0,0);
+    shader2.begin();
+    shader2.setUniformTexture("wetness", wetness, 1);
+    ofDrawRectangle(0,0,ofGetWidth(),ofGetHeight());
+    shader2.end();
+  fbo2.end();
+  fbo2.readToPixels(wetnessp);
+  fbo2.draw(400,400);
+  for(int y=0;y<20;y++) {
+    for(int x=0;x<20;x++) {
+      string str = ofToString((float)wetnessp.getColor(x, y).r);
+      ofDrawBitmapString(str, x*15., y*15.);
+    }
+  }
 }
 
 //--------------------------------------------------------------

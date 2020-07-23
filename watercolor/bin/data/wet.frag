@@ -10,7 +10,7 @@ void main()
   float astamp = texture2DRect(stamp, pos).a;
   
   if (astamp > 0.) {
-    rgbwetness.r = max(rgbwetness.r + 5./w, 0.);
+    rgbwetness.r = rgbwetness.r + .02;
   }
 
   gl_FragColor = vec4(rgbwetness, 1.);
