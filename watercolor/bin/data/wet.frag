@@ -5,7 +5,7 @@ uniform float w;
 void main()
 {
   vec2 pos = gl_FragCoord.xy;
-  pos.y = w - pos.y;
+//  pos.y = w - pos.y;
   vec3 rgbwetness = texture2DRect(wetness, pos).rgb;
   float astamp = texture2DRect(stamp, pos).a;
   

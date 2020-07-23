@@ -44,6 +44,7 @@
 		B1D02C7224C93AE90089A849 /* dry.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = dry.frag; path = bin/data/dry.frag; sourceTree = SOURCE_ROOT; };
 		B1D02C7324C93C3C0089A849 /* wet.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = wet.frag; path = bin/data/wet.frag; sourceTree = SOURCE_ROOT; };
 		B1D02C7424C93F950089A849 /* shader2.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = shader2.frag; path = bin/data/shader2.frag; sourceTree = SOURCE_ROOT; };
+		B1D02C7524C94CBC0089A849 /* dialate.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = dialate.frag; path = bin/data/dialate.frag; sourceTree = SOURCE_ROOT; };
 		C774F730BE04A62F60AC963A /* liveCodeUtils.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = liveCodeUtils.h; path = ../../../addons/ofxCppSketch/src/liveCodeUtils.h; sourceTree = SOURCE_ROOT; };
 		CA08C2B331B24182BA5F9B0A /* Dylib.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = Dylib.h; path = ../../../addons/ofxCppSketch/src/Dylib.h; sourceTree = SOURCE_ROOT; };
 		D249FFB0E0DB1FE102E17F9A /* ofxCppSketchSoundStream.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = ofxCppSketchSoundStream.h; path = ../../../addons/ofxCppSketch/src/ofxCppSketchSoundStream.h; sourceTree = SOURCE_ROOT; };
@@ -604,6 +605,7 @@
 				B1D02C7324C93C3C0089A849 /* wet.frag */,
 				B1D02C7424C93F950089A849 /* shader2.frag */,
 				B1D02C7124C8FAAF0089A849 /* shader.frag */,
+				B1D02C7524C94CBC0089A849 /* dialate.frag */,
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
 				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,

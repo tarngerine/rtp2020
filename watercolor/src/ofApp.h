@@ -38,6 +38,6 @@ class ofApp : public ofBaseApp{
   ofShader dry;
   ofShader wet;
   ofShader shader2;
-  ofShader shader3;
+  ofShader dialate;
   vector<int> wetness1d;
 };

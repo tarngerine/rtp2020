@@ -7,6 +7,7 @@ void ofApp::setup(){
   dry.load("", "dry.frag");
   wet.load("", "wet.frag");
   shader2.load("", "shader2.frag");
+  dialate.load("", "shader2.frag");
   fbo1.allocate(ofGetWidth(),ofGetHeight());
   fbo1.begin();
     ofClear(255,255,255,255);
@@ -42,6 +43,7 @@ void ofApp::update(){
     wet.load("", "wet.frag");
     dry.load("", "dry.frag");
     shader2.load("", "shader2.frag");
+    dialate.load("", "dialate.frag");
   }
   brush.clear();
 
@@ -122,7 +124,6 @@ void ofApp::draw(){
       ofPushMatrix();
       ofTranslate(mouse);
       ofScale(stampSize);
-    // not enough bit precision for such a low alpha
     stamp.setFillColor(ofColor(0,0,0,40));
       stamp.draw();
       ofPopMatrix();
@@ -135,21 +136,7 @@ void ofApp::draw(){
       fbo2.draw(0,0);
     canvas.end();
     
-//    // add to wetness matrix
-//    ofPixels pxl;
-//    fbo2.readToPixels(pxl, 0);
-//    for(int y=0;y<pxl.getHeight();y++) {
-//      for(int x=0;x<pxl.getWidth();x++) {
-//        ofColor clr = pxl.getColor(x, y);
-//        if (clr.a > 0) {
-//          // add 5 frames of wetness
-//          ofColor clr = wetnessp.getColor(x, y);
-//          // max out at 255, dont loop
-//          wetnessp.setColor(x, y, ofColor(MIN((clr.getBrightness() + 5), 255)));
-//        }
-//      }
-//    }
-
+    // add to wetness matrix
     wetness.begin();
       wet.begin();
         wet.setUniformTexture("stamp", fbo2, 1);
@@ -159,6 +146,16 @@ void ofApp::draw(){
       wet.end();
     wetness.end();
   }
+  
+  
+  // dialate wetness
+  wetness.begin();
+    dialate.begin();
+      dialate.setUniformTexture("wetness", wetness, 1);
+      dialate.setUniform1f("w", ofGetWidth());
+      ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+    dialate.end();
+  wetness.end();
   
   ofSetColor(255);
 
@@ -185,17 +182,24 @@ void ofApp::draw(){
   fbo2.end();
   fbo2.readToPixels(wetnessp);
   fbo2.draw(400,400);
+  ofSetColor(0,0,255);
   for(int y=0;y<20;y++) {
     for(int x=0;x<20;x++) {
       string str = ofToString((float)wetnessp.getColor(x, y).r);
       ofDrawBitmapString(str, x*15., y*15.);
     }
   }
+  ofSetColor(255);
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-
+  wetness.begin();
+  ofClear(0,0,0,255);
+  wetness.end();
+  canvas.begin();
+  ofClear(255,255,255,255);
+  canvas.end();
 }
 
 //--------------------------------------------------------------
