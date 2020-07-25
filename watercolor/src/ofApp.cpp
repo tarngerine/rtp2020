@@ -100,14 +100,14 @@ void ofApp::draw(){
   
   ofBackground(0);
   // Brush preview
-  fbo1.begin();
-    ofClear(0);
-    ofSetColor(255,255,0);
-    ofPushMatrix();
-    ofTranslate(mouse.x,mouse.y);
-    brush.draw();
-    ofPopMatrix();
-  fbo1.end();
+//  fbo1.begin();
+//    ofClear(0);
+//    ofSetColor(255,255,0);
+//    ofPushMatrix();
+//    ofTranslate(mouse.x,mouse.y);
+//    brush.draw();
+//    ofPopMatrix();
+//  fbo1.end();
 
   if (isDrawing) {
     // Draw newest stamp in to determine wetness
