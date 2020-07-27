@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxTablet.h"
 
 class ofApp : public ofBaseApp{
 
@@ -8,7 +9,7 @@ class ofApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
-
+    
 		void keyPressed(int key);
 		void keyReleased(int key);
 		void mouseMoved(int x, int y );
@@ -25,6 +26,9 @@ class ofApp : public ofBaseApp{
   ofFbo canvas;
   ofPolyline brush;
   ofPolyline line1;
+  ofPolyline trail;
+  ofPolyline trailResampled;
+  vector<float> trailPressure;
   ofVec2f mouse = ofVec2f(0,0);
   ofPath stamp;
   bool isDrawing;
@@ -40,4 +44,8 @@ class ofApp : public ofBaseApp{
   ofShader shader2;
   ofShader dialate;
   vector<int> wetness1d;
+  
+  void tabletMoved(TabletData &data);
+  float pressure = 1;
+  float speed = 1;
 };

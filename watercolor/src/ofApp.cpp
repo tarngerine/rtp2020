@@ -1,8 +1,12 @@
 #include "ofApp.h"
+#include "ofxTablet.h"
 
 //--------------------------------------------------------------
 void ofApp::setup(){
   ofEnableAlphaBlending();
+  ofxTablet::start();
+  
+  // Shaders
   shader.load("", "shader.frag");
   dry.load("", "dry.frag");
   wet.load("", "wet.frag");
@@ -38,6 +42,14 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+  TabletData &data = ofxTablet::tabletData;
+  pressure = data.pressure;
+  // non tablet usage
+  if (pressure == 0) pressure = 1;
+  
+  
+  speed = ofMap(abs((velocity.x + velocity.y)/2.), 0, 50, 1, .05);
+  
   if (ofGetFrameNum()%60) {
     shader.load("", "shader.frag");
     wet.load("", "wet.frag");
@@ -75,14 +87,30 @@ void ofApp::update(){
     if (abs(velocity.x) < 2 && abs(velocity.y) < 2) {
       stampSize = MIN(stampSize + .01, 1.5);
     } else {
-      stampSize = MAX(stampSize - .01, 1.);
+      stampSize = MAX(stampSize - .01, .5);
     }
+    
+    stampSize *= speed * pressure;
     
     stamp.clear();
     for(int i=0; i<brush.size();i++) {
       stamp.lineTo(brush[i]);
     }
     stamp.close();
+    
+    if (abs(velocity.x + velocity.y)/2. > 1.) {
+      trail.addVertex(mouse.x, mouse.y);
+      trailPressure.push_back(stampSize);
+    }
+    if (trail.size() > 10) {
+      trail.getVertices().erase(trail.getVertices().begin());
+      trailPressure.erase(trailPressure.begin());
+    }
+    trailResampled = trail.getResampledBySpacing(5.);
+  } else {
+    trail.clear();
+    trailResampled.clear();
+    trailPressure.clear();
   }
   
   // dry wetness
@@ -110,6 +138,8 @@ void ofApp::draw(){
 //  fbo1.end();
 
   if (isDrawing) {
+    float darkness = ofMap(pow(speed, 2), 0, 1, 10, 200);
+
     // Draw newest stamp in to determine wetness
     fbo2.begin();
       ofClear(0,0,0,0);
@@ -117,22 +147,34 @@ void ofApp::draw(){
       ofTranslate(mouse);
       ofScale(stampSize);
     // play with having a small version of the stamp inside the big one to simulate the brush lift effect of leaving a spot in the middle
-    
     // play with gradiating outwards from center (dark-> light) instead of a flat color
-    
     // play with having more than 1 stamp at once with lower opacity to have a more natural appearance
     
     // play with squash/stretch with velocity to help avoid "broken shapes" effect
-    // and/or interpolate stamps (add additional ones in between current and prev to account for fps) if velocity > some amount
     
     // play with squash/stretch depending on the direction you move your pen to allow for diff parts of a character
-    
-    // play with trailing like polyline add trail of stamps, and generate stamp per vertex
+
     
     // allow gou/hooks with a flick, map velocity to size where faster = smaller past a certain threshold
-    stamp.setFillColor(ofColor(0,0,0,ofMap(abs((velocity.x+velocity.y)/2.),0,100,80,10)));
+    
+    
+      stamp.setFillColor(ofColor(0, 0, 0, darkness));
       stamp.draw();
       ofPopMatrix();
+    
+    // Draw trail
+    
+      for(int i = 1; i < trailResampled.size(); i++) {
+        ofPushMatrix();
+          ofTranslate(trailResampled[i]);
+          ofRotateDeg(i * 10);
+        float closestSize = floor(ofMap(i, 0, trailResampled.size(), 0, trailPressure.size()));
+          ofScale(trailPressure[closestSize]);
+          stamp.draw();
+        ofPopMatrix();
+      }
+    
+      
     fbo2.end();
     
 
@@ -159,6 +201,10 @@ void ofApp::draw(){
     dialate.begin();
       dialate.setUniformTexture("wetness", wetness, 1);
       dialate.setUniform1f("w", ofGetWidth());
+
+      dialate.setUniform1f("rnd", (ofRandomf() + 1) / 2);
+
+      dialate.setUniform1f("t", ofGetElapsedTimef());
       ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
     dialate.end();
   wetness.end();
@@ -175,7 +221,14 @@ void ofApp::draw(){
   canvas.end();
 
   canvas.draw(0,0);
-  fbo1.draw(0,0);
+  
+//  for (int i = 0; i < trailResampled.size(); i++) {
+//    ofSetColor(0,0,255);
+//    ofDrawCircle(trailResampled[i].x, trailResampled[i].y, 10);
+//  }
+//  trailResampled.draw();
+
+//  fbo1.draw(0,0);
   
   // debug preview wetness
 //
@@ -196,16 +249,20 @@ void ofApp::draw(){
 //    }
 //  }
 //  ofSetColor(255);
+  
+  ofSetColor(0); ofDrawBitmapString(ofToString(ofGetFrameRate()), 10, 10);
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-  wetness.begin();
-  ofClear(0,0,0,255);
-  wetness.end();
-  canvas.begin();
-  ofClear(255,255,255,255);
-  canvas.end();
+  if (key == 'c') {
+    wetness.begin();
+    ofClear(0,0,0,255);
+    wetness.end();
+    canvas.begin();
+    ofClear(255,255,255,255);
+    canvas.end();
+  }
 }
 
 //--------------------------------------------------------------
