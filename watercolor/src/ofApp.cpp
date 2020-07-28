@@ -45,6 +45,7 @@ void ofApp::update(){
   TabletData &data = ofxTablet::tabletData;
   pressure = data.pressure;
   // non tablet usage
+  
   if (pressure == 0) {
     pressure = 1;
     usingTablet = false;
@@ -53,7 +54,7 @@ void ofApp::update(){
   }
   
   
-  speed = ofClamp(ofMap((abs(velocity.x) + abs(velocity.y))/2., 0, 100, 0, 1), 0, 1);
+  speed = ofClamp(ofMap((abs(velocity.x) + abs(velocity.y))/2., 0, 30, 0, 1), 0, 1);
   
   if (ofGetFrameNum()%60) {
     shader.load("", "shader.frag");
@@ -69,7 +70,7 @@ void ofApp::update(){
     brush.addVertex(50*cos(prg), 50*sin(prg));
   }
   
-  float offset = 40;
+  float offset = 20;
   float t = ofGetElapsedTimef();
   float noiseX = mouse.x + t;
   float noiseY = mouse.y + t;
@@ -89,16 +90,10 @@ void ofApp::update(){
   if (isDrawing) {
     brush = brush.getSmoothed(3);
 
-    if (abs(velocity.x) < 2 && abs(velocity.y) < 2) {
-      stampSize = MIN(stampSize + .01, 1.5);
-    } else {
-      stampSize = MAX(stampSize - .01, .5);
-    }
-    
     if (usingTablet) {
-      stampSize *= pressure;
+      stampSize = ofMap(pow(pressure, 2), 0, 1, .01, .8);
     } else {
-      stampSize *= (1 - speed);
+      stampSize = ofMap(speed, 1, 0, .05, .5);
     }
     
     stamp.clear();
@@ -164,7 +159,9 @@ void ofApp::draw(){
       ofClear(0,0,0,0);
       ofPushMatrix();
       ofTranslate(mouse);
-      ofScale(trailSize[0]);
+      ofScale(trailSize[trailSize.size() - 1]);
+    
+  
     // play with having a small version of the stamp inside the big one to simulate the brush lift effect of leaving a spot in the middle
     // play with gradiating outwards from center (dark-> light) instead of a flat color
     // play with having more than 1 stamp at once with lower opacity to have a more natural appearance
@@ -177,7 +174,7 @@ void ofApp::draw(){
     // allow gou/hooks with a flick, map velocity to size where faster = smaller past a certain threshold
     
     
-      stamp.setFillColor(ofColor(0, 0, 0, trailColor[0]));
+      stamp.setFillColor(ofColor(0, 0, 0, trailColor[trailColor.size() - 1]));
       stamp.draw();
       ofPopMatrix();
     
@@ -186,12 +183,31 @@ void ofApp::draw(){
         ofPushMatrix();
           ofTranslate(trailResampled[i]);
           ofRotateDeg(i * 10);
-          int closestIndex = floor(ofMap(i, 0, trailResampled.size(), 0, trailSize.size()));
-        ofScale(trailSize[closestIndex]);
         
+        float scale = trailSize[0];
+        float alpha = trailColor[0];
+        if (trailSize.size() > 1) {
+          int closestIndex = floor(ofMap(i, 0, trailResampled.size() - 1, 0, trailSize.size() - 1));
+          // interpolate size and color
+          float resampleStart = (closestIndex) * (trailResampled.size() - 1) / (trailSize.size() - 1);
+          float resampleEnd = (closestIndex + 1) * (trailResampled.size() - 1) / (trailSize.size() - 1);
+          scale = ofMap(i, resampleStart, resampleEnd, trailSize[closestIndex], trailSize[closestIndex + 1]);
+          alpha = ofMap(i, resampleStart, resampleEnd, trailColor[closestIndex], trailColor[closestIndex + 1]);
+        }
         
-        stamp.setFillColor(ofColor(0, 0, 0, trailColor[closestIndex]));
+          // bleed
+//          ofScale(scale * 1.5);
+//          stamp.setFillColor(ofColor(0, 0, 0, alpha));
+//          stamp.draw();
+//          ofScale(1 / (scale * 1.5));
+        
+          // ink
+        ofRotateDeg(5);
+          ofScale(scale);
+          stamp.setFillColor(ofColor(0, 0, 0, 255));
           stamp.draw();
+        
+        
         ofPopMatrix();
       }
     
@@ -271,7 +287,8 @@ void ofApp::draw(){
 //  }
 //  ofSetColor(255);
   
-  ofSetColor(0); ofDrawBitmapString(ofToString(ofGetFrameRate()), 10, 10);
+  ofSetColor(0);
+  ofDrawBitmapString(ofToString(ofGetFrameRate()), 10, 10);
 }
 
 //--------------------------------------------------------------

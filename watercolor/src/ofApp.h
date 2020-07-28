@@ -52,4 +52,6 @@ class ofApp : public ofBaseApp{
   bool usingTablet = false;
   float pressure = 1;
   float speed = 1;
+  
+  vector<float> alphaResampled;
 };
