@@ -29,6 +29,9 @@ class ofApp : public ofBaseApp{
   ofPolyline trail;
   ofPolyline trailResampled;
   vector<float> trailPressure;
+  vector<float> trailColor;
+  vector<float> trailSpeed;
+  vector<float> trailSize;
   ofVec2f mouse = ofVec2f(0,0);
   ofPath stamp;
   bool isDrawing;
@@ -46,6 +49,7 @@ class ofApp : public ofBaseApp{
   vector<int> wetness1d;
   
   void tabletMoved(TabletData &data);
+  bool usingTablet = false;
   float pressure = 1;
   float speed = 1;
 };

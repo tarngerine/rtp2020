@@ -45,10 +45,15 @@ void ofApp::update(){
   TabletData &data = ofxTablet::tabletData;
   pressure = data.pressure;
   // non tablet usage
-  if (pressure == 0) pressure = 1;
+  if (pressure == 0) {
+    pressure = 1;
+    usingTablet = false;
+  } else {
+    usingTablet = true;
+  }
   
   
-  speed = ofMap(abs((velocity.x + velocity.y)/2.), 0, 50, 1, .05);
+  speed = ofClamp(ofMap((abs(velocity.x) + abs(velocity.y))/2., 0, 100, 0, 1), 0, 1);
   
   if (ofGetFrameNum()%60) {
     shader.load("", "shader.frag");
@@ -90,7 +95,11 @@ void ofApp::update(){
       stampSize = MAX(stampSize - .01, .5);
     }
     
-    stampSize *= speed * pressure;
+    if (usingTablet) {
+      stampSize *= pressure;
+    } else {
+      stampSize *= (1 - speed);
+    }
     
     stamp.clear();
     for(int i=0; i<brush.size();i++) {
@@ -98,19 +107,30 @@ void ofApp::update(){
     }
     stamp.close();
     
-    if (abs(velocity.x + velocity.y)/2. > 1.) {
+    float alpha = ofMap(pow(speed, 1), 0, 1, 200, 100);
+    
+    if (true || abs(velocity.x + velocity.y)/2. > 1.) {
       trail.addVertex(mouse.x, mouse.y);
-      trailPressure.push_back(stampSize);
+      trailPressure.push_back(pressure);
+      trailSpeed.push_back(speed);
+      trailColor.push_back(alpha);
+      trailSize.push_back(stampSize);
     }
-    if (trail.size() > 10) {
+    if (trail.size() > 5) {
       trail.getVertices().erase(trail.getVertices().begin());
       trailPressure.erase(trailPressure.begin());
+      trailSpeed.erase(trailSpeed.begin());
+      trailColor.erase(trailColor.begin());
+      trailSize.erase(trailSize.begin());
     }
     trailResampled = trail.getResampledBySpacing(5.);
   } else {
     trail.clear();
     trailResampled.clear();
     trailPressure.clear();
+    trailSpeed.clear();
+    trailColor.clear();
+    trailSize.clear();
   }
   
   // dry wetness
@@ -138,14 +158,13 @@ void ofApp::draw(){
 //  fbo1.end();
 
   if (isDrawing) {
-    float darkness = ofMap(pow(speed, 2), 0, 1, 10, 200);
 
     // Draw newest stamp in to determine wetness
     fbo2.begin();
       ofClear(0,0,0,0);
       ofPushMatrix();
       ofTranslate(mouse);
-      ofScale(stampSize);
+      ofScale(trailSize[0]);
     // play with having a small version of the stamp inside the big one to simulate the brush lift effect of leaving a spot in the middle
     // play with gradiating outwards from center (dark-> light) instead of a flat color
     // play with having more than 1 stamp at once with lower opacity to have a more natural appearance
@@ -158,18 +177,20 @@ void ofApp::draw(){
     // allow gou/hooks with a flick, map velocity to size where faster = smaller past a certain threshold
     
     
-      stamp.setFillColor(ofColor(0, 0, 0, darkness));
+      stamp.setFillColor(ofColor(0, 0, 0, trailColor[0]));
       stamp.draw();
       ofPopMatrix();
     
     // Draw trail
-    
       for(int i = 1; i < trailResampled.size(); i++) {
         ofPushMatrix();
           ofTranslate(trailResampled[i]);
           ofRotateDeg(i * 10);
-        float closestSize = floor(ofMap(i, 0, trailResampled.size(), 0, trailPressure.size()));
-          ofScale(trailPressure[closestSize]);
+          int closestIndex = floor(ofMap(i, 0, trailResampled.size(), 0, trailSize.size()));
+        ofScale(trailSize[closestIndex]);
+        
+        
+        stamp.setFillColor(ofColor(0, 0, 0, trailColor[closestIndex]));
           stamp.draw();
         ofPopMatrix();
       }
